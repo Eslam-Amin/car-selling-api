@@ -2,10 +2,28 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository, Like } from 'typeorm';
+import { CreateUserDto } from './dtos/create-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
+
+  createOne(
+    email: string,
+    password: string,
+    username: string,
+    firstName: string,
+    lastName: string,
+  ) {
+    const user = this.repo.create({
+      email,
+      password,
+      username,
+      firstName,
+      lastName,
+    });
+    return this.repo.save(user);
+  }
 
   findAll(skip: number, limit: number, name: string) {
     let filter: any = {};
