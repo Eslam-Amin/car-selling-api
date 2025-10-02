@@ -1,14 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
 
-  findAll() {
-    return this.repo.find({});
+  findAll(skip: number, limit: number, name: string) {
+    let filter: any = {};
+    if (name)
+      filter = [
+        { firstName: Like(`%${name}%`) },
+        { lastName: Like(`%${name}%`) },
+      ];
+
+    return this.repo.find({
+      skip,
+      take: limit,
+      where: filter,
+    });
   }
 
   async findOne(id: number) {

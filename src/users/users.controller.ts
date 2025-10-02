@@ -11,6 +11,12 @@ export class UsersController {
     const users = await this.usersService.findAll();
     return {
       message: 'Users fetched successfully',
+      pagination: {
+        page,
+        limit,
+        totalPages: Math.ceil(users.length / limit),
+        total: users.length,
+      },
       data: users,
     };
   }
