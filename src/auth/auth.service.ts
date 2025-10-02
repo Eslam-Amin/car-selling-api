@@ -1,7 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
@@ -21,9 +26,10 @@ export class AuthService {
       throw new BadRequestException('Email in use');
     else if (existingUser?.username === username)
       throw new BadRequestException('Username in use');
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = this.repo.create({
       email,
-      password,
+      password: hashedPassword,
       username,
       firstName,
       lastName,
