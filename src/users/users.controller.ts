@@ -1,4 +1,14 @@
-import { Controller, Delete, Get, Patch, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  Patch,
+  Param,
+  ParseIntPipe,
+  Query,
+  Body,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 
@@ -7,8 +17,13 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  async getUsers() {
-    const users = await this.usersService.findAll();
+  async getUsers(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('name') name: string,
+  ) {
+    const skip = (page - 1) * limit;
+    const users = await this.usersService.findAll(skip, limit, name);
     return {
       message: 'Users fetched successfully',
       pagination: {
