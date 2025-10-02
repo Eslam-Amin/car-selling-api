@@ -1,0 +1,21 @@
+{
+  // Use Prettier as the default formatter
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Format files on save
+  "editor.formatOnSave": true,
+
+  // Normalize line endings (LF)
+  "files.eol": "\n",
+
+  // Make sure a newline is added at the end of every file
+  "files.insertFinalNewline": true,
+
+  // Trim extra spaces on save
+  "files.trimTrailingWhitespace": true,
+
+  // (Optional) Enable ESLint fixes on save if you use ESLint
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}
