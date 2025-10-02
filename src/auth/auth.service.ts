@@ -35,18 +35,17 @@ export class AuthService {
       lastName,
     });
     const savedUser = await this.repo.save(user);
-    return { ...savedUser, password: undefined };
+    return savedUser;
   }
 
   async login(email: string, password: string) {
     const user = await this.repo.findOne({
       where: { email },
-      select: ['id', 'email', 'password', 'username', 'firstName', 'lastName'],
     });
     if (!user) throw new NotFoundException('Invalid credentials');
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new NotFoundException('Invalid credentials');
 
-    return { ...user, password: undefined };
+    return user;
   }
 }
