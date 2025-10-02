@@ -7,10 +7,14 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import * as bcrypt from 'bcryptjs';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    private usersService: UsersService,
+    @InjectRepository(User) private repo: Repository<User>,
+  ) {}
 
   async signup(
     email: string,
@@ -27,15 +31,13 @@ export class AuthService {
     else if (existingUser?.username === username)
       throw new BadRequestException('Username in use');
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = this.repo.create({
+    return this.usersService.createOne(
       email,
-      password: hashedPassword,
+      hashedPassword,
       username,
       firstName,
       lastName,
-    });
-    const savedUser = await this.repo.save(user);
-    return savedUser;
+    );
   }
 
   async login(email: string, password: string) {
