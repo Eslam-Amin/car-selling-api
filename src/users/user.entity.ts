@@ -34,7 +34,7 @@ export class User {
   @Column({ default: false })
   verified: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   code: string | null;
 
   // Virtual field
