@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import * as bcrypt from 'bcryptjs';
@@ -26,7 +26,7 @@ export class AuthService {
     lastName: string,
   ) {
     const existingUser = await this.repo.findOne({
-      where: [{ email }, { username }],
+      where: [{ email: ILike(email) }, { username: ILike(username) }],
     });
     if (existingUser?.email === email)
       throw new BadRequestException('Email in use');
