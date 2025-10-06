@@ -35,7 +35,7 @@ export class User {
   verified: boolean;
 
   @Column({ nullable: true })
-  code: string;
+  code: string | null;
 
   // Virtual field
   fullName: string;
