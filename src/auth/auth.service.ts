@@ -47,9 +47,7 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const user = await this.repo.findOne({
-      where: { email },
-    });
+    const user = await this.usersService.findOne(email);
     if (!user) throw new NotFoundException('Invalid credentials');
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new NotFoundException('Invalid credentials');
@@ -60,9 +58,8 @@ export class AuthService {
   }
 
   async verify(email: string, code: string) {
-    const user = await this.repo.findOne({
-      where: { email },
-    });
+    const user = await this.usersService.findOne(email);
+
     if (!user) throw new NotFoundException('Invalid credentials');
     const isCodeValid = await bcrypt.compare(code, user.code as string);
     if (!isCodeValid) throw new BadRequestException('Invalid code');
