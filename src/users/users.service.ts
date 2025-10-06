@@ -13,6 +13,7 @@ export class UsersService {
     username: string,
     firstName: string,
     lastName: string,
+    code?: string,
   ) {
     const user = this.repo.create({
       email,
@@ -20,6 +21,7 @@ export class UsersService {
       username,
       firstName,
       lastName,
+      code,
     });
     return this.repo.save(user);
   }
