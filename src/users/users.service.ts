@@ -1,11 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, ILike } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  async findOne(id: number): Promise<User>;
+  async findOne(emailOrUsername: string): Promise<User>;
+
+  async findOne(identifier: number | string): Promise<User> {
+    let user: User | null;
+    if (typeof identifier === 'number') {
+      user = await this.repo.findOne({ where: { id: identifier } });
+    } else {
+      user = await this.repo.findOne({
+        where: [{ username: ILike(identifier) }, { email: ILike(identifier) }],
+      });
+    }
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
+  }
 
   createOne(
     email: string,
@@ -39,12 +56,6 @@ export class UsersService {
       take: limit,
       where: filter,
     });
-  }
-
-  async findOne(id: number) {
-    const user = await this.repo.findOne({ where: { id } });
-    if (!user) throw new NotFoundException('User not found');
-    return user;
   }
 
   async updateOne(id: number, attrs: Partial<User>) {
