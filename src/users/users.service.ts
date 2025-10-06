@@ -11,13 +11,12 @@ export class UsersService {
 
   async findOne(identifier: number | string): Promise<User> {
     let user: User | null;
-    if (typeof identifier === 'number') {
+    if (typeof identifier === 'number')
       user = await this.repo.findOne({ where: { id: identifier } });
-    } else {
+    else
       user = await this.repo.findOne({
         where: [{ username: ILike(identifier) }, { email: ILike(identifier) }],
       });
-    }
 
     if (!user) throw new NotFoundException('User not found');
 
