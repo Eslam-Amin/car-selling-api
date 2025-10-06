@@ -7,7 +7,7 @@ import { Repository, Like, ILike } from 'typeorm';
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
   async findOne(id: number): Promise<User>;
-  async findOne(emailOrUsername: string): Promise<User>;
+  async findOne(identifier: string): Promise<User>;
 
   async findOne(identifier: number | string): Promise<User> {
     let user: User | null;
