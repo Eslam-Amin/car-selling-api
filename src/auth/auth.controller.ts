@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from 'src/users/dtos/user.dto';
+import { VerifyDto } from './dtos/verify.dto';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -30,6 +31,15 @@ export class AuthController {
     const user = await this.authService.login(body.email, body.password);
     return {
       message: 'User logged in successfully',
+      data: user,
+    };
+  }
+
+  @Post('/verify')
+  async verify(@Body() body: VerifyDto) {
+    const user = await this.authService.verify(body.email, body.code);
+    return {
+      message: 'User verified successfully',
       data: user,
     };
   }
