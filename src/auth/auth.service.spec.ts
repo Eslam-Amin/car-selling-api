@@ -16,9 +16,24 @@ describe('AuthService', () => {
   let fakeUsersService: Partial<UsersService>;
 
   beforeEach(async () => {
-    // Create a fake copy of the users service
+    const users: Partial<User>[] = [];
     fakeUsersService = {
-      findOne: () => Promise.resolve({} as User),
+      findOne: (
+        identifier: string | number | { email: string; username: string },
+      ) => {
+        let user: Partial<User> | undefined = undefined;
+        if (typeof identifier === 'object') {
+          user = users.find(
+            (user) =>
+              user.email === identifier.email ||
+              user.username === identifier.username,
+          );
+        } else if (typeof identifier === 'string')
+          user = users.find((user) => user.email === identifier);
+        else user = users.find((user) => user.id === identifier);
+
+        return Promise.resolve(user as User);
+      },
       createOne: (
         email: string,
         password: string,
@@ -26,16 +41,20 @@ describe('AuthService', () => {
         firstName: string,
         lastName: string,
         code?: string,
-      ) =>
-        Promise.resolve({
-          id: 1,
+      ) => {
+        const user = {
+          id: Math.floor(100000 + Math.random() * 900000),
           email,
           password,
           username,
           firstName,
           lastName,
-          code,
-        }) as Promise<User>,
+          code: code || null,
+          verified: false,
+        };
+        users.push(user);
+        return Promise.resolve(user as User);
+      },
     };
 
     const fakeUserRepository: Partial<Repository<User>> = {
@@ -84,17 +103,13 @@ describe('AuthService', () => {
   });
 
   it('throws an error if user signs up with email that is in use', async () => {
-    fakeUsersService.findOne = () =>
-      Promise.resolve({
-        id: 1,
-        email: 'test@test.com',
-        password: 'password',
-        username: 'testUsername',
-        firstName: 'testFirstName',
-        lastName: 'testLastName',
-        verified: false,
-        code: '123456',
-      }) as Promise<User>;
+    await service.signup(
+      'test@test.com',
+      'password',
+      'testUsername',
+      'testFirstName',
+      'testLastName',
+    );
 
     await expect(
       service.signup(
@@ -108,17 +123,13 @@ describe('AuthService', () => {
   });
 
   it('throws an error if user signs up with username that is in use', async () => {
-    fakeUsersService.findOne = () =>
-      Promise.resolve({
-        id: 1,
-        email: 'test@test.com',
-        password: 'password',
-        username: 'testUsername',
-        firstName: 'testFirstName',
-        lastName: 'testLastName',
-        verified: false,
-        code: '123456',
-      }) as Promise<User>;
+    await service.signup(
+      'test@test.com',
+      'password',
+      'testUsername',
+      'testFirstName',
+      'testLastName',
+    );
 
     await expect(
       service.signup(
@@ -132,14 +143,20 @@ describe('AuthService', () => {
   });
 
   it('throws an error if user logins with invalid credentials (email)', async () => {
-    fakeUsersService.findOne = jest.fn().mockResolvedValue(null);
-    await expect(service.login('test@test.com', 'password')).rejects.toThrow(
+    await service.signup(
+      'test@test.com',
+      'password',
+      'testUsername',
+      'testFirstName',
+      'testLastName',
+    );
+    await expect(service.login('test1@test.com', 'password')).rejects.toThrow(
       'Invalid credentials',
     );
   });
 
   it('throws an error if user logins with invalid credentials (password)', async () => {
-    const user = await service.signup(
+    await service.signup(
       'test@test.com',
       'password',
       'testUsername',
@@ -147,40 +164,33 @@ describe('AuthService', () => {
       'testLastName',
     );
 
-    fakeUsersService.findOne = jest.fn().mockResolvedValue({
-      username: 'testUsername',
-      email: 'test@test.com',
-      verified: true,
-      password: '$2b$10$a9wpKHT9NjbGylAKk7BcmOUvg3wRtMWy.P64HzUP3OqSGn0lFw8sW ',
-    });
-
     await expect(service.login('test@test.com', 'password1')).rejects.toThrow(
       'Invalid credentials',
     );
   });
 
   it('throws an error if user logins and is not verified', async () => {
-    fakeUsersService.findOne = jest.fn().mockResolvedValue({
-      username: 'testUsername',
-      email: 'test@test.com',
-      verified: false,
-      password: '$2b$10$a9wpKHT9NjbGylAKk7BcmOUvg3wRtMWy.P64HzUP3OqSGn0lFw8sW',
-    });
-
+    await service.signup(
+      'test@test.com',
+      'password',
+      'testUsername',
+      'testFirstName',
+      'testLastName',
+    );
     await expect(service.login('test@test.com', 'password')).rejects.toThrow(
       'User is not verified',
     );
   });
 
   it('logins an user', async () => {
-    const user = {
-      username: 'testUsername',
-      email: 'test@test.com',
-      verified: true,
-      password: '$2b$10$a9wpKHT9NjbGylAKk7BcmOUvg3wRtMWy.P64HzUP3OqSGn0lFw8sW',
-    };
-    fakeUsersService.findOne = jest.fn().mockResolvedValue(user);
-
+    const user = await service.signup(
+      'test@test.com',
+      'password',
+      'testUsername',
+      'testFirstName',
+      'testLastName',
+    );
+    user.verified = true;
     const loggedInUser = await service.login('test@test.com', 'password');
     await expect(loggedInUser).toEqual(user);
   });
