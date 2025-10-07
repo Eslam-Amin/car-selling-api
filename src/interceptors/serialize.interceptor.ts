@@ -26,9 +26,9 @@ export class SerializeInterceptor implements NestInterceptor {
       map((data: any) => {
         // Run something before the response is sent out
         return {
-          message: data.message,
-          pagination: data.pagination,
-          data: plainToClass(this.dto, data.data, {
+          message: data?.message,
+          pagination: data?.pagination,
+          data: plainToClass(this.dto, data?.data, {
             excludeExtraneousValues: true,
           }),
         };
