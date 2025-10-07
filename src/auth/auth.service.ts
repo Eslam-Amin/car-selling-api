@@ -7,8 +7,8 @@ import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import * as bcrypt from 'bcryptjs';
-import { UsersService } from 'src/users/users.service';
-import { EmailService } from 'src/email/email.service';
+import { UsersService } from '../users/users.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -25,9 +25,7 @@ export class AuthService {
     firstName: string,
     lastName: string,
   ) {
-    const existingUser = await this.repo.findOne({
-      where: [{ email: ILike(email) }, { username: ILike(username) }],
-    });
+    const existingUser = await this.usersService.findOne({ email, username });
     if (existingUser?.email === email)
       throw new BadRequestException('Email in use');
     else if (existingUser?.username === username)
@@ -52,7 +50,7 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new NotFoundException('Invalid credentials');
 
-    if (!user.verified) throw new BadRequestException('User not verified');
+    if (!user.verified) throw new BadRequestException('User is not verified');
 
     return user;
   }
