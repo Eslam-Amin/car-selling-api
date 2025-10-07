@@ -5,7 +5,6 @@ import {
   Session,
   Get,
   UnauthorizedException,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { AuthService } from './auth.service';
@@ -16,7 +15,6 @@ import { VerifyDto } from './dtos/verify.dto';
 import { UsersService } from 'src/users/users.service';
 import { CurrentUser } from 'src/users/decorators/current-user.decorator';
 import { User } from 'src/users/user.entity';
-import { CurrentUserInterceptor } from 'src/users/interceptors/current-user.interceptor';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -70,7 +68,6 @@ export class AuthController {
   }
 
   @Get('/whoami')
-  @UseInterceptors(CurrentUserInterceptor)
   async whoami(@CurrentUser() user: User) {
     if (!user) throw new UnauthorizedException('Unauthorized');
     return {
