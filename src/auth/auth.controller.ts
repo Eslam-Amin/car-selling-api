@@ -48,6 +48,14 @@ export class AuthController {
     };
   }
 
+  @Post('/logout')
+  async logout(@Session() session: any) {
+    session.userId = null;
+    return {
+      message: 'User logged out successfully',
+    };
+  }
+
   @Post('/verify')
   async verify(@Body() body: VerifyDto) {
     const user = await this.authService.verify(body.email, body.code);
