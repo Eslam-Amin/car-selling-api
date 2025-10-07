@@ -8,11 +8,21 @@ export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
   async findOne(id: number): Promise<User>;
   async findOne(identifier: string): Promise<User>;
+  async findOne(identifier: { email: string; username: string }): Promise<User>;
 
-  async findOne(identifier: number | string): Promise<User> {
+  async findOne(
+    identifier: number | string | { email: string; username: string },
+  ): Promise<User> {
     let user: User | null;
     if (typeof identifier === 'number')
       user = await this.repo.findOne({ where: { id: identifier } });
+    else if (typeof identifier === 'object')
+      user = await this.repo.findOne({
+        where: [
+          { username: ILike(identifier.username) },
+          { email: ILike(identifier.email) },
+        ],
+      });
     else
       user = await this.repo.findOne({
         where: [{ username: ILike(identifier) }, { email: ILike(identifier) }],
