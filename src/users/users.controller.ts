@@ -12,9 +12,9 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { AuthGuard } from '../guards/auth.guard';
 @Controller('users')
 @Serialize(UserDto)
 export class UsersController {
@@ -25,10 +25,10 @@ export class UsersController {
   async getUsers(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('name') name: string,
+    @Query('name') name?: string,
   ) {
     const skip = (page - 1) * limit;
-    const users = await this.usersService.findAll(skip, limit, name);
+    const users = await this.usersService.findAll(skip, limit, name || '');
     return {
       message: 'Users fetched successfully',
       pagination: {
