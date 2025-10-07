@@ -64,4 +64,14 @@ export class AuthController {
       data: user,
     };
   }
+
+  @Get('/whoami')
+  async whoami(@Session() session: any) {
+    if (!session.userId) throw new UnauthorizedException('Unauthorized');
+    const user = await this.usersService.findOne(session.userId);
+    return {
+      message: 'User fetched successfully',
+      data: user,
+    };
+  }
 }
