@@ -8,18 +8,20 @@ import {
   ParseIntPipe,
   Query,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
-
+import { AuthGuard } from 'src/guards/auth.guard';
 @Controller('users')
 @Serialize(UserDto)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
+  @UseGuards(AuthGuard)
   async getUsers(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -43,7 +45,6 @@ export class UsersController {
   @Get('/:id')
   async getUser(@Param('id') id: string) {
     const user = await this.usersService.findOne(parseInt(id));
-    // return user;
     return {
       message: 'User fetched successfully',
       data: user,
