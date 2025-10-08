@@ -8,7 +8,8 @@ import {
   AfterUpdate,
   AfterRemove,
   AfterLoad,
-  VirtualColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -42,6 +43,12 @@ export class User {
 
   // Virtual field
   fullName: string;
+
+  @CreateDateColumn({ type: 'datetime' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'datetime' })
+  updatedAt: Date;
 
   @AfterLoad()
   setFullName() {
