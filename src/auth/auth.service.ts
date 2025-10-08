@@ -34,9 +34,11 @@ export class AuthService {
     else if (existingUser?.username === username)
       throw new BadRequestException('Username in use');
     const hashedPassword = await bcrypt.hash(password, 10);
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    await this.emailService.sendVerificationEmail(email, code);
-    const hashedCode = await bcrypt.hash(code, 10);
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000,
+    ).toString();
+    await this.emailService.sendVerificationEmail(email, verificationCode);
+    const hashedCode = await bcrypt.hash(verificationCode, 10);
     const user = await this.usersService.createOne(
       email,
       hashedPassword,
@@ -47,7 +49,7 @@ export class AuthService {
     );
     return {
       user,
-      code,
+      verificationCode,
     };
   }
 
@@ -66,10 +68,13 @@ export class AuthService {
     const user = await this.usersService.findOne(email, false);
 
     if (!user) throw new NotFoundException('Invalid credentials');
-    const isCodeValid = await bcrypt.compare(code, user.code as string);
+    const isCodeValid = await bcrypt.compare(
+      code,
+      user.verificationCode as string,
+    );
     if (!isCodeValid) throw new BadRequestException('Invalid code');
     user.verified = true;
-    user.code = null;
+    user.verificationCode = null;
     return this.repo.save(user);
   }
 }

@@ -49,7 +49,7 @@ describe('AuthService', () => {
           username,
           firstName,
           lastName,
-          code: code || null,
+          verificationCode: code || null,
           verified: false,
         };
         users.push(user);
@@ -92,7 +92,7 @@ describe('AuthService', () => {
   });
 
   it('creates a new user with a salted and hashed password', async () => {
-    const user = await service.signup(
+    const { user } = await service.signup(
       'test@test.com',
       'password',
       'testUsername',
@@ -183,7 +183,7 @@ describe('AuthService', () => {
   });
 
   it('logins an user', async () => {
-    const user = await service.signup(
+    const { user } = await service.signup(
       'test@test.com',
       'password',
       'testUsername',
