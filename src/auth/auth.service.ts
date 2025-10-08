@@ -85,4 +85,18 @@ export class AuthService {
     user.verificationCodeExpiresAt = null;
     return this.repo.save(user);
   }
+
+  async sendVerificationCode(email: string) {
+    const user = await this.usersService.findOne(email, false);
+    if (!user) throw new NotFoundException('User not found');
+    if (user.verified) throw new BadRequestException('User already verified');
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000,
+    ).toString();
+    await this.emailService.sendVerificationEmail(email, verificationCode);
+    const hashedCode = await bcrypt.hash(verificationCode, 10);
+    user.verificationCode = hashedCode;
+    user.verificationCodeExpiresAt = new Date(Date.now() + 1000 * 60 * 10);
+    return this.repo.save(user);
+  }
 }
