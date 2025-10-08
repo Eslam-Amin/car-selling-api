@@ -14,6 +14,7 @@ import { UserDto } from '../users/dtos/user.dto';
 import { VerifyDto } from './dtos/verify.dto';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
+import { SendVerificationCodeDto } from './dtos/sendVerificationCode.dto';
 
 @Controller('auth')
 @Serialize(UserDto)
@@ -62,6 +63,15 @@ export class AuthController {
     const user = await this.authService.verify(body.email, body.code);
     return {
       message: 'User verified successfully',
+      data: user,
+    };
+  }
+
+  @Post('/verification-code')
+  async resendVerificationCode(@Body() body: SendVerificationCodeDto) {
+    const user = await this.authService.sendVerificationCode(body.email);
+    return {
+      message: 'Verification code resent successfully',
       data: user,
     };
   }
