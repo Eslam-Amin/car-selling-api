@@ -6,13 +6,17 @@ import { Repository, Like, ILike } from 'typeorm';
 @Injectable()
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
-  async findOne(id: number): Promise<User>;
-  async findOne(identifier: string): Promise<User>;
-  async findOne(identifier: { email: string; username: string }): Promise<User>;
+  async findOne(id: number, throwError?: boolean): Promise<User | null>;
+  async findOne(identifier: string, throwError?: boolean): Promise<User | null>;
+  async findOne(
+    identifier: { email: string; username: string },
+    throwError?: boolean,
+  ): Promise<User | null>;
 
   async findOne(
     identifier: number | string | { email: string; username: string },
-  ): Promise<User> {
+    throwError: boolean = true,
+  ): Promise<User | null> {
     let user: User | null;
     if (typeof identifier === 'number')
       user = await this.repo.findOne({ where: { id: identifier } });
@@ -28,9 +32,9 @@ export class UsersService {
         where: [{ username: ILike(identifier) }, { email: ILike(identifier) }],
       });
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user && throwError) throw new NotFoundException('User not found');
 
-    return user;
+    return user ?? null;
   }
 
   createOne(

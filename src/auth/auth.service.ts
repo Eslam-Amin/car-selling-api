@@ -25,7 +25,10 @@ export class AuthService {
     firstName: string,
     lastName: string,
   ) {
-    const existingUser = await this.usersService.findOne({ email, username });
+    const existingUser = await this.usersService.findOne(
+      { email, username },
+      false,
+    );
     if (existingUser?.email === email)
       throw new BadRequestException('Email in use');
     else if (existingUser?.username === username)
@@ -45,7 +48,7 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const user = await this.usersService.findOne(email);
+    const user = await this.usersService.findOne(email, false);
     if (!user) throw new NotFoundException('Invalid credentials');
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new NotFoundException('Invalid credentials');
@@ -56,7 +59,7 @@ export class AuthService {
   }
 
   async verify(email: string, code: string) {
-    const user = await this.usersService.findOne(email);
+    const user = await this.usersService.findOne(email, false);
 
     if (!user) throw new NotFoundException('Invalid credentials');
     const isCodeValid = await bcrypt.compare(code, user.code as string);
