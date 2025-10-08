@@ -22,7 +22,7 @@ export class AuthController {
 
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
-    const user = await this.authService.signup(
+    const { user, code } = await this.authService.signup(
       body.email,
       body.password,
       body.username,
@@ -33,6 +33,7 @@ export class AuthController {
     return {
       message: 'User created successfully',
       data: user,
+      activationCode: code,
     };
   }
 

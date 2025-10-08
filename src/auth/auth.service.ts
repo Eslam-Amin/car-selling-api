@@ -37,7 +37,7 @@ export class AuthService {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     await this.emailService.sendVerificationEmail(email, code);
     const hashedCode = await bcrypt.hash(code, 10);
-    return this.usersService.createOne(
+    const user = await this.usersService.createOne(
       email,
       hashedPassword,
       username,
@@ -45,6 +45,10 @@ export class AuthService {
       lastName,
       hashedCode,
     );
+    return {
+      user,
+      code,
+    };
   }
 
   async login(email: string, password: string) {
