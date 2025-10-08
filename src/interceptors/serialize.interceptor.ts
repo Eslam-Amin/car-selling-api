@@ -24,13 +24,17 @@ export class SerializeInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       map((data: any) => {
+        console.log('🚀 ~ SerializeInterceptor ~ intercept ~ data:', data);
         // Run something before the response is sent out
         return {
           message: data?.message,
           pagination: data?.pagination,
-          data: plainToClass(this.dto, data?.data, {
-            excludeExtraneousValues: true,
-          }),
+          data: {
+            ...plainToClass(this.dto, data?.data, {
+              excludeExtraneousValues: true,
+            }),
+            ...data.other,
+          },
         };
       }),
     );
