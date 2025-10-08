@@ -39,6 +39,7 @@ export class AuthService {
     ).toString();
     await this.emailService.sendVerificationEmail(email, verificationCode);
     const hashedCode = await bcrypt.hash(verificationCode, 10);
+    const verificationCodeExpiresAt = new Date(Date.now() + 1000 * 60 * 10);
     const user = await this.usersService.createOne(
       email,
       hashedPassword,
@@ -46,6 +47,7 @@ export class AuthService {
       firstName,
       lastName,
       hashedCode,
+      verificationCodeExpiresAt,
     );
     return {
       user,
@@ -73,8 +75,14 @@ export class AuthService {
       user.verificationCode as string,
     );
     if (!isCodeValid) throw new BadRequestException('Invalid code');
+    if (
+      user.verificationCodeExpiresAt &&
+      user?.verificationCodeExpiresAt < new Date()
+    )
+      throw new BadRequestException('Code expired');
     user.verified = true;
     user.verificationCode = null;
+    user.verificationCodeExpiresAt = null;
     return this.repo.save(user);
   }
 }
