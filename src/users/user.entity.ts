@@ -37,6 +37,9 @@ export class User {
   @Column({ type: 'text', nullable: true })
   verificationCode: string | null;
 
+  @Column({ type: 'date', nullable: true })
+  verificationCodeExpiresAt: Date | null;
+
   // Virtual field
   fullName: string;
 
