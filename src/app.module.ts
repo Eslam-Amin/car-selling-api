@@ -12,12 +12,18 @@ import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    CacheModule.register({
+      ttl: 3600000,
+      max: 100,
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
