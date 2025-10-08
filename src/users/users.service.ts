@@ -1,11 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository, Like, ILike } from 'typeorm';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private repo: Repository<User>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
   async findOne(id: number, throwError?: boolean): Promise<User | null>;
   async findOne(identifier: string, throwError?: boolean): Promise<User | null>;
   async findOne(
@@ -18,19 +23,26 @@ export class UsersService {
     throwError: boolean = true,
   ): Promise<User | null> {
     let user: User | null;
-    if (typeof identifier === 'number')
+    const cacheKey = `user-${identifier}`;
+    if (typeof identifier === 'number') {
+      const cachedUser = await this.cacheManager.get(cacheKey);
+      if (cachedUser) return cachedUser as User;
       user = await this.repo.findOne({ where: { id: identifier } });
-    else if (typeof identifier === 'object')
+      await this.cacheManager.set(cacheKey, user);
+    } else if (typeof identifier === 'object')
       user = await this.repo.findOne({
         where: [
           { username: ILike(identifier.username) },
           { email: ILike(identifier.email) },
         ],
       });
-    else
+    else {
+      const cachedUser = await this.cacheManager.get(cacheKey);
+      if (cachedUser) return cachedUser as User;
       user = await this.repo.findOne({
-        where: [{ username: ILike(identifier) }, { email: ILike(identifier) }],
+        where: { email: ILike(identifier) },
       });
+    }
 
     if (!user && throwError) throw new NotFoundException('User not found');
 
@@ -58,19 +70,25 @@ export class UsersService {
     return this.repo.save(user);
   }
 
-  findAll(skip: number, limit: number, name: string) {
+  async findAll(skip: number, limit: number, name: string) {
     let filter: any = {};
     if (name)
       filter = [
         { firstName: Like(`%${name}%`) },
         { lastName: Like(`%${name}%`) },
       ];
+    const cacheKey = `users_${JSON.stringify({ skip, limit, name })}`;
+    const cachedUsers = await this.cacheManager.get(cacheKey);
+    if (cachedUsers) return JSON.parse(cachedUsers as string) as User[];
 
-    return this.repo.find({
+    const users = await this.repo.find({
       skip,
       take: limit,
       where: filter,
     });
+
+    await this.cacheManager.set(cacheKey, JSON.stringify(users));
+    return users as User[];
   }
 
   async updateOne(id: number, attrs: Partial<User>) {
@@ -85,11 +103,14 @@ export class UsersService {
   async deleteOne(id: number) {
     const user = await this.findOne(id);
     if (!user) throw new NotFoundException('User not found');
+    await this.cacheManager.del(`user-${id}`);
+    await this.cacheManager.del(`user-${user.email}`);
 
     return this.repo.remove(user);
   }
 
   async deleteAll() {
+    await this.cacheManager.clear();
     return this.repo.clear();
   }
 }
