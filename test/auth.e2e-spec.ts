@@ -48,7 +48,7 @@ describe('Authentication Service (e2e)', () => {
       })
       .expect(201);
 
-    const { verificationCode } = signupRes.body;
+    const { verificationCode } = signupRes.body.data;
     await request(app.getHttpServer())
       .post('/auth/verify')
       .send({ email, code: verificationCode })
