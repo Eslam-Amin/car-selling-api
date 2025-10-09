@@ -33,22 +33,17 @@ export class AuthService {
       throw new BadRequestException('Email in use');
     else if (existingUser?.username === username)
       throw new BadRequestException('Username in use');
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationCode = Math.floor(
-      100000 + Math.random() * 900000,
-    ).toString();
-    await this.emailService.sendVerificationEmail(email, verificationCode);
-    const hashedCode = await bcrypt.hash(verificationCode, 10);
-    const verificationCodeExpiresAt = new Date(Date.now() + 1000 * 60 * 10);
+
     const user = await this.usersService.createOne(
       email,
       hashedPassword,
       username,
       firstName,
       lastName,
-      hashedCode,
-      verificationCodeExpiresAt,
     );
+    const { verificationCode } = await this.sendVerificationCode(email, user);
     return {
       user,
       verificationCode,
@@ -86,17 +81,30 @@ export class AuthService {
     return this.repo.save(user);
   }
 
-  async sendVerificationCode(email: string) {
-    const user = await this.usersService.findOne(email, false);
-    if (!user) throw new NotFoundException('User not found');
-    if (user.verified) throw new BadRequestException('User already verified');
+  async sendVerificationCode(
+    email: string,
+    createdUser?: User,
+  ): Promise<{ user: User; verificationCode: string }> {
+    let user: User;
+    if (createdUser) user = createdUser;
+    else {
+      user = (await this.usersService.findOne(email, false)) as User;
+      if (!user) throw new NotFoundException('User not found');
+      else if (user.verified)
+        throw new BadRequestException('User already verified');
+    }
+
     const verificationCode = Math.floor(
       100000 + Math.random() * 900000,
     ).toString();
     await this.emailService.sendVerificationEmail(email, verificationCode);
+
     const hashedCode = await bcrypt.hash(verificationCode, 10);
     user.verificationCode = hashedCode;
     user.verificationCodeExpiresAt = new Date(Date.now() + 1000 * 60 * 10);
-    return this.repo.save(user);
+
+    const savedUser = await this.repo.save(user);
+
+    return { user: savedUser, verificationCode };
   }
 }
