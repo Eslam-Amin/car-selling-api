@@ -68,11 +68,19 @@ export class AuthController {
   }
 
   @Post('/verification-code')
-  async resendVerificationCode(@Body() body: SendVerificationCodeDto) {
-    const { user } = await this.authService.sendVerificationCode(body.email);
+  async resendVerificationCode(
+    @Body() body: SendVerificationCodeDto,
+    @Session() session: any,
+  ) {
+    const { user, verificationCode } =
+      await this.authService.sendVerificationCode(body.email);
+    session.userId = user.id;
     return {
       message: 'Verification code resent successfully',
       data: user,
+      other: {
+        verificationCode,
+      },
     };
   }
 
