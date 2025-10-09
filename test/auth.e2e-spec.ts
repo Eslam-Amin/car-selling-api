@@ -21,8 +21,8 @@ describe('Authentication Service (e2e)', () => {
     await app.init();
   });
 
-  it('handles Signup request (Post)', () => {
-    return request(app.getHttpServer())
+  it('handles Signup request (Post)', async () => {
+    await request(app.getHttpServer())
       .post('/auth/signup')
       .send({ email, password, username, firstName, lastName })
       .expect(201)
