@@ -34,9 +34,7 @@ export class AuthController {
     return {
       message: 'User created successfully',
       data: user,
-      other: {
-        verificationCode,
-      },
+      other: process.env.NODE_ENV! == 'test' ? { verificationCode } : {},
     };
   }
 
@@ -78,9 +76,7 @@ export class AuthController {
     return {
       message: 'Verification code resent successfully',
       data: user,
-      other: {
-        verificationCode,
-      },
+      other: process.env.NODE_ENV! == 'test' ? { verificationCode } : {},
     };
   }
 
