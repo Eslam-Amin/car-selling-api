@@ -37,4 +37,8 @@ export class ReportsService {
     if (!report) throw new NotFoundException('Report not found');
     return this.repo.delete(id);
   }
+
+  async deleteAll() {
+    return this.repo.clear();
+  }
 }

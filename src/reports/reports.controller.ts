@@ -76,4 +76,13 @@ export class ReportsController {
       data: {},
     };
   }
+
+  @Delete()
+  async deleteAllReports() {
+    await this.reportsService.deleteAll();
+    return {
+      message: 'All reports deleted successfully',
+      data: {},
+    };
+  }
 }
