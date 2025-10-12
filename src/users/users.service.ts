@@ -77,18 +77,33 @@ export class UsersService {
         { firstName: Like(`%${name}%`) },
         { lastName: Like(`%${name}%`) },
       ];
-    const cacheKey = `users_${JSON.stringify({ skip, limit, name })}`;
-    const cachedUsers = await this.cacheManager.get(cacheKey);
-    if (cachedUsers) return JSON.parse(cachedUsers as string) as User[];
+    const cacheKeyForUsers = `users_${JSON.stringify({ skip, limit, name })}`;
+    const cacheKeyForTotalNumberOfUsers = `users_count_${name ?? ''}`;
+    const cachedUsers = await this.cacheManager.get(cacheKeyForUsers);
+    const cachedTotalNumberOfUsers = await this.cacheManager.get(
+      cacheKeyForTotalNumberOfUsers,
+    );
+    if (cachedUsers && cachedTotalNumberOfUsers)
+      return {
+        users: JSON.parse(cachedUsers as string) as User[],
+        totalNumberOfUsers: cachedTotalNumberOfUsers as number,
+      };
 
     const users = await this.repo.find({
       skip,
       take: limit,
       where: filter,
     });
-
-    await this.cacheManager.set(cacheKey, JSON.stringify(users));
-    return users as User[];
+    const totalNumberOfUsers = await this.repo.count({ where: filter });
+    await this.cacheManager.set(cacheKeyForUsers, JSON.stringify(users));
+    await this.cacheManager.set(
+      cacheKeyForTotalNumberOfUsers,
+      totalNumberOfUsers,
+    );
+    return {
+      users,
+      totalNumberOfUsers,
+    };
   }
 
   async updateOne(id: number, attrs: Partial<User>) {
