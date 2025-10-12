@@ -12,6 +12,7 @@ export class EmailService {
       template: 'verification',
       context: {
         code,
+        year: new Date().getFullYear(),
       },
     });
   }
