@@ -20,10 +20,10 @@ import { join } from 'path';
           },
         },
         defaults: {
-          from: `"No Reply" <${config.get('EMAIL_USER')}>`,
+          from: `"Selling Cars API" <${config.get('EMAIL_USER')}>`,
         },
         template: {
-          dir: join(process.cwd(), 'src/templates'), // ✅ This is the correct place
+          dir: join(process.cwd(), 'src/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
