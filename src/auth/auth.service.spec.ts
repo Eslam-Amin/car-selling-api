@@ -5,6 +5,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { EmailService } from '../email/email.service';
 import { Repository } from 'typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
 
 // jest.mock('bcryptjs', () => ({
 //   hash: jest.fn(() => Promise.resolve('hashedPassword')),
@@ -68,6 +69,13 @@ describe('AuthService', () => {
     };
 
     const module = await Test.createTestingModule({
+      imports: [
+        CacheModule.register({
+          ttl: 3600000,
+          max: 100,
+          isGlobal: true,
+        }),
+      ],
       providers: [
         AuthService,
         {
