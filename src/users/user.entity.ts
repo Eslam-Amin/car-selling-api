@@ -10,7 +10,9 @@ import {
   AfterLoad,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Report } from 'src/reports/report.entity';
 
 @Entity()
 export class User {
@@ -49,6 +51,9 @@ export class User {
 
   @UpdateDateColumn({ type: 'datetime' })
   updatedAt: Date;
+
+  @OneToMany(() => Report, (report) => report.user)
+  reports: Report[];
 
   @AfterLoad()
   setFullName() {
