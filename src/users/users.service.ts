@@ -32,8 +32,8 @@ export class UsersService {
     } else if (typeof identifier === 'object')
       user = await this.repo.findOne({
         where: [
-          { username: ILike(identifier.username) },
-          { email: ILike(identifier.email) },
+          { username: ILike(identifier?.username) },
+          { email: ILike(identifier?.email) },
         ],
       });
     else {
