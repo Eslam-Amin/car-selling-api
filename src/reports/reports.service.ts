@@ -25,10 +25,16 @@ export class ReportsService {
     return report;
   }
 
-  async updateOne(id: number, reportDto: CreateReportDto) {
+  async updateOne(id: number, reportDto: Partial<CreateReportDto>) {
     const report = await this.repo.findOneBy({ id });
     if (!report) throw new NotFoundException('Report not found');
     Object.assign(report, reportDto);
     return this.repo.save(report);
+  }
+
+  async deleteOne(id: number) {
+    const report = await this.repo.findOneBy({ id });
+    if (!report) throw new NotFoundException('Report not found');
+    return this.repo.delete(id);
   }
 }
