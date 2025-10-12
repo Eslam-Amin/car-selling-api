@@ -77,8 +77,8 @@ export class UsersService {
         { firstName: Like(`%${name}%`) },
         { lastName: Like(`%${name}%`) },
       ];
-    const cacheKeyForUsers = `users_${JSON.stringify({ skip, limit, name })}`;
-    const cacheKeyForTotalNumberOfUsers = `users_count_${name ?? ''}`;
+    const cacheKeyForUsers = `users-${JSON.stringify({ skip, limit, name })}`;
+    const cacheKeyForTotalNumberOfUsers = `users-count-${name ?? ''}`;
     const cachedUsers = await this.cacheManager.get(cacheKeyForUsers);
     const cachedTotalNumberOfUsers = await this.cacheManager.get(
       cacheKeyForTotalNumberOfUsers,
@@ -89,12 +89,11 @@ export class UsersService {
         totalNumberOfUsers: cachedTotalNumberOfUsers as number,
       };
 
-    const users = await this.repo.find({
-      skip,
-      take: limit,
-      where: filter,
-    });
-    const totalNumberOfUsers = await this.repo.count({ where: filter });
+    const [users, totalNumberOfUsers] = await Promise.all([
+      this.repo.find({ skip, take: limit, where: filter }),
+      this.repo.count({ where: filter }),
+    ]);
+
     await this.cacheManager.set(cacheKeyForUsers, JSON.stringify(users));
     await this.cacheManager.set(
       cacheKeyForTotalNumberOfUsers,

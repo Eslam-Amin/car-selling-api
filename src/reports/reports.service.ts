@@ -16,8 +16,10 @@ export class ReportsService {
   }
 
   async findAll(skip: number, limit: number) {
-    const reportsCount = await this.repo.count();
-    const reports = await this.repo.find({ skip, take: limit });
+    const [reports, reportsCount] = await Promise.all([
+      this.repo.find({ skip, take: limit }),
+      this.repo.count(),
+    ]);
     return { reports, reportsCount };
   }
 
