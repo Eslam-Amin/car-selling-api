@@ -65,6 +65,8 @@ export class AuthService {
     const user = await this.usersService.findOne(email, false);
 
     if (!user) throw new NotFoundException('Invalid credentials');
+    if (user.verified)
+      throw new BadRequestException('User is already verified');
     const isCodeValid = await bcrypt.compare(
       code,
       user.verificationCode as string,
