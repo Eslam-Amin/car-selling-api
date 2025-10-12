@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,6 +10,8 @@ import { User } from '../users/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
 import { EmailService } from '../email/email.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +19,7 @@ export class AuthService {
     private usersService: UsersService,
     @InjectRepository(User) private repo: Repository<User>,
     private emailService: EmailService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async signup(
@@ -80,6 +84,8 @@ export class AuthService {
     user.verified = true;
     user.verificationCode = null;
     user.verificationCodeExpiresAt = null;
+    await this.cacheManager.del(`user-${user.id}`);
+    await this.cacheManager.del(`user-${user.email}`);
     return this.repo.save(user);
   }
 
