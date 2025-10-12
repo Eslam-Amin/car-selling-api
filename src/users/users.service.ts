@@ -109,7 +109,8 @@ export class UsersService {
   async updateOne(id: number, attrs: Partial<User>) {
     const user = await this.findOne(id);
     if (!user) throw new NotFoundException('User not found');
-
+    await this.cacheManager.del(`user-${id}`);
+    await this.cacheManager.del(`user-${user.email}`);
     // return this.repo.update(id, attrs);
     Object.assign(user, attrs);
     return this.repo.save(user);
