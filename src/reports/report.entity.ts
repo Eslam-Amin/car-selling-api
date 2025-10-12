@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Report {
@@ -25,4 +31,10 @@ export class Report {
 
   @Column()
   lat: number;
+
+  @CreateDateColumn({ type: 'datetime' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'datetime' })
+  updatedAt: Date;
 }
