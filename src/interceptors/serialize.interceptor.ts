@@ -28,12 +28,10 @@ export class SerializeInterceptor implements NestInterceptor {
         return {
           message: data?.message,
           pagination: data?.pagination,
-          data: {
-            ...plainToClass(this.dto, data?.data, {
-              excludeExtraneousValues: true,
-            }),
-            ...data.other,
-          },
+          data: plainToClass(this.dto, data?.data, {
+            excludeExtraneousValues: true,
+          }),
+          other: data.other,
         };
       }),
     );
