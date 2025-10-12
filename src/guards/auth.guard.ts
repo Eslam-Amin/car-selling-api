@@ -1,5 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -18,6 +22,8 @@ export class AuthGuard implements CanActivate {
       request.session.userId = null;
       return false;
     }
+    if (!user.verified) throw new UnauthorizedException('User is not verified');
+
     return request.session.userId;
   }
 }
