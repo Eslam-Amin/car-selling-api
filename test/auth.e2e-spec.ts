@@ -48,7 +48,7 @@ describe('Authentication Service (e2e)', () => {
       })
       .expect(201);
 
-    const { verificationCode } = signupRes.body.data;
+    const { verificationCode } = signupRes.body.other;
     await request(app.getHttpServer())
       .post('/auth/verify')
       .send({ email, code: verificationCode })
@@ -74,7 +74,7 @@ describe('Authentication Service (e2e)', () => {
       .send({ email, password, username, firstName, lastName })
       .expect(201);
 
-    const { verificationCode } = signupRes.body.data;
+    const { verificationCode } = signupRes.body.other;
     return request(app.getHttpServer())
       .post('/auth/verify')
       .send({ email, code: verificationCode })
@@ -94,7 +94,7 @@ describe('Authentication Service (e2e)', () => {
       .post('/auth/signup')
       .send({ email, password, username, firstName, lastName })
       .expect(201);
-    const { verificationCode } = signupRes.body.data;
+    const { verificationCode } = signupRes.body.other;
 
     await request(app.getHttpServer())
       .post('/auth/verify')
