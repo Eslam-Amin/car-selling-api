@@ -28,14 +28,18 @@ export class UsersController {
     @Query('name') name?: string,
   ) {
     const skip = (page - 1) * limit;
-    const users = await this.usersService.findAll(skip, limit, name || '');
+    const { users, totalNumberOfUsers } = await this.usersService.findAll(
+      skip,
+      limit,
+      name || '',
+    );
     return {
       message: 'Users fetched successfully',
       pagination: {
         page,
         limit,
-        totalPages: Math.ceil(users.length / limit),
-        total: users.length,
+        totalPages: Math.ceil(totalNumberOfUsers / limit),
+        total: totalNumberOfUsers,
       },
       data: users,
     };
