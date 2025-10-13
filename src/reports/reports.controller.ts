@@ -26,8 +26,12 @@ export class ReportsController {
   constructor(private reportsService: ReportsService) {}
   @Post()
   @UseGuards(AuthGuard)
-  createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
-    return this.reportsService.createOne(body, user);
+  async createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
+    const report = await this.reportsService.createOne(body, user);
+    return {
+      message: 'Report created successfully',
+      data: report,
+    };
   }
 
   @Get()
