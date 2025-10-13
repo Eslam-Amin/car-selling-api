@@ -17,14 +17,17 @@ export class ReportsService {
 
   async findAll(skip: number, limit: number) {
     const [reports, reportsCount] = await Promise.all([
-      this.repo.find({ skip, take: limit }),
+      this.repo.find({ skip, take: limit, relations: ['user'] }),
       this.repo.count(),
     ]);
     return { reports, reportsCount };
   }
 
   async findOne(id: number) {
-    const report = await this.repo.findOneBy({ id });
+    const report = await this.repo.findOne({
+      where: { id },
+      relations: ['user'],
+    });
     if (!report) throw new NotFoundException('Report not found');
     return report;
   }
