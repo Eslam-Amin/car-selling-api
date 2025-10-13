@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository, Like, ILike } from 'typeorm';
 import type { Cache } from 'cache-manager';
-
+import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class UsersService {
   constructor(
@@ -55,8 +55,10 @@ export class UsersService {
     username: string,
     firstName: string,
     lastName: string,
-    verificationCode?: string,
-    verificationCodeExpiresAt?: Date,
+    verificationCode?: string | null,
+    verificationCodeExpiresAt?: Date | null,
+    isAdmin?: boolean,
+    verified?: boolean,
   ) {
     const user = this.repo.create({
       email,
@@ -66,14 +68,17 @@ export class UsersService {
       lastName,
       verificationCode,
       verificationCodeExpiresAt,
+      isAdmin,
+      verified,
     });
     return this.repo.save(user);
   }
 
   async findAll(skip: number, limit: number, name: string) {
-    let filter: any = {};
+    let filter: any = { isAdmin: false };
     if (name)
       filter = [
+        ...filter,
         { firstName: Like(`%${name}%`) },
         { lastName: Like(`%${name}%`) },
       ];
@@ -118,8 +123,7 @@ export class UsersService {
   async deleteOne(id: number) {
     const user = await this.findOne(id);
     if (!user) throw new NotFoundException('User not found');
-    await this.cacheManager.del(`user-${id}`);
-    await this.cacheManager.del(`user-${user.email}`);
+    await this.cacheManager.clear();
 
     return this.repo.remove(user);
   }
@@ -127,5 +131,32 @@ export class UsersService {
   async deleteAll() {
     await this.cacheManager.clear();
     return this.repo.clear();
+  }
+
+  async createDefaultAdminUser(): Promise<void> {
+    const existingUser = await this.repo.findOne({
+      where: { email: `${process.env.ADMIN_EMAIL}` },
+    });
+
+    if (!existingUser) {
+      const hashedPassword = await bcrypt.hash(
+        `${process.env.ADMIN_PASSWORD}`,
+        10,
+      );
+      const user = this.createOne(
+        `${process.env.ADMIN_EMAIL}`,
+        hashedPassword,
+        'iamsuperadmin',
+        'Super',
+        'Admin',
+        null,
+        null,
+        true,
+        true,
+      );
+      console.log('Default user created');
+    } else {
+      console.log('Default user already exists');
+    }
   }
 }
