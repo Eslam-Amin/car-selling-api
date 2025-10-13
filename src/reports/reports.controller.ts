@@ -18,6 +18,7 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { ReportDto } from './dtos/report.dto';
+import { IsAdminGuard } from '../guards/isAdmin.guard';
 
 @Controller('reports')
 @UseGuards(AuthGuard)
@@ -73,6 +74,16 @@ export class ReportsController {
     const report = await this.reportsService.updateOne(id, body);
     return {
       message: 'Report updated successfully',
+      data: report,
+    };
+  }
+
+  @Patch('/:id/approve')
+  @UseGuards(IsAdminGuard)
+  async approveReport(@Param('id', ParseIntPipe) id: number) {
+    const report = await this.reportsService.updateOne(id, { approved: true });
+    return {
+      message: 'Report approved successfully',
       data: report,
     };
   }
