@@ -5,6 +5,7 @@ import {
   Min,
   IsLongitude,
   IsLatitude,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateReportDto {
@@ -33,4 +34,7 @@ export class CreateReportDto {
 
   @IsLatitude()
   lat: number;
+
+  @IsBoolean()
+  approved: boolean;
 }
