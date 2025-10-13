@@ -43,6 +43,9 @@ export class User {
   @Column({ type: 'datetime', nullable: true })
   verificationCodeExpiresAt: Date | null;
 
+  @Column({ default: false })
+  isAdmin: boolean;
+
   // Virtual field
   fullName: string;
 
