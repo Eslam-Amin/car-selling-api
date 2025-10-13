@@ -34,6 +34,9 @@ export class Report {
   @Column()
   lat: number;
 
+  @Column({ default: false })
+  approved: boolean;
+
   @CreateDateColumn({ type: 'datetime' })
   createdAt: Date;
 
