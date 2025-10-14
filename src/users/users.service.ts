@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository, Like, ILike } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import type { Cache } from 'cache-manager';
 import * as bcrypt from 'bcryptjs';
 @Injectable()
@@ -32,15 +32,15 @@ export class UsersService {
     } else if (typeof identifier === 'object')
       user = await this.repo.findOne({
         where: [
-          { username: ILike(identifier?.username) },
-          { email: ILike(identifier?.email) },
+          { username: identifier?.username },
+          { email: identifier?.email },
         ],
       });
     else {
       const cachedUser = await this.cacheManager.get(cacheKey);
       if (cachedUser) return cachedUser as User;
       user = await this.repo.findOne({
-        where: { email: ILike(identifier) },
+        where: { email: identifier },
       });
     }
 
@@ -79,8 +79,8 @@ export class UsersService {
     if (name)
       filter = [
         ...filter,
-        { firstName: Like(`%${name}%`) },
-        { lastName: Like(`%${name}%`) },
+        { firstName: ILike(`%${name}%`) },
+        { lastName: ILike(`%${name}%`) },
       ];
     const cacheKeyForUsers = `users-${JSON.stringify({ skip, limit, name })}`;
     const cacheKeyForTotalNumberOfUsers = `users-count-${name ?? ''}`;
