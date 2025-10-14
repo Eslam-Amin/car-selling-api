@@ -68,19 +68,20 @@ export class AuthService {
   async verify(email: string, code: string) {
     const user = await this.usersService.findOne(email, false);
 
-    if (!user) throw new NotFoundException('Invalid credentials');
+    if (!user) throw new NotFoundException('Invalid Email Address');
     if (user.verified)
-      throw new BadRequestException('User is already verified');
+      throw new BadRequestException('User is already Verified');
     const isCodeValid = await bcrypt.compare(
       code,
       user.verificationCode as string,
     );
-    if (!isCodeValid) throw new BadRequestException('Invalid code');
+    if (!isCodeValid)
+      throw new BadRequestException('Invalid Verification C ode');
     if (
       user.verificationCodeExpiresAt &&
       user?.verificationCodeExpiresAt < new Date()
     )
-      throw new BadRequestException('Code expired');
+      throw new BadRequestException('Verification Code Expired');
     user.verified = true;
     user.verificationCode = null;
     user.verificationCodeExpiresAt = null;
