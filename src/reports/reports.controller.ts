@@ -19,12 +19,22 @@ import { User } from '../users/user.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { ReportDto } from './dtos/report.dto';
 import { IsAdminGuard } from '../guards/isAdmin.guard';
-
+import { GetEstimateDto } from './dtos/get-estimate.dto';
 @Controller('reports')
 @UseGuards(AuthGuard)
 @Serialize(ReportDto)
 export class ReportsController {
   constructor(private reportsService: ReportsService) {}
+
+  @Get('/estimate')
+  async getEstimate(@Query() query: GetEstimateDto) {
+    const estimate = await this.reportsService.getEstimate(query);
+    return {
+      message: 'Estimate fetched successfully',
+      data: estimate,
+    };
+  }
+
   @Post()
   @UseGuards(AuthGuard)
   async createReport(@Body() body: CreateReportDto, @CurrentUser() user: User) {
@@ -89,6 +99,7 @@ export class ReportsController {
   }
 
   @Delete('/:id')
+  @UseGuards(IsAdminGuard)
   async deleteReport(@Param('id', ParseIntPipe) id: number) {
     await this.reportsService.deleteOne(id);
     return {
@@ -98,6 +109,7 @@ export class ReportsController {
   }
 
   @Delete()
+  @UseGuards(IsAdminGuard)
   async deleteAllReports() {
     await this.reportsService.deleteAll();
     return {
