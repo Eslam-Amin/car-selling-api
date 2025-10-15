@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsNumber,
   IsString,
@@ -10,9 +11,11 @@ import {
 
 export class CreateReportDto {
   @IsString()
+  @Transform(({ value }) => value.toLowerCase())
   make: string;
 
   @IsString()
+  @Transform(({ value }) => value.toLowerCase())
   model: string;
 
   @IsNumber()
