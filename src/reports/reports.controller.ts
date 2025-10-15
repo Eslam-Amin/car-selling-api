@@ -20,6 +20,8 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { ReportDto } from './dtos/report.dto';
 import { IsAdminGuard } from '../guards/isAdmin.guard';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
+import { GetReportsDto } from './dtos/get-reports.dto';
+
 @Controller('reports')
 @UseGuards(AuthGuard)
 @Serialize(ReportDto)
@@ -49,11 +51,13 @@ export class ReportsController {
   async getReports(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query() query: GetReportsDto,
   ) {
     const skip = (page - 1) * limit;
     const { reports, reportsCount } = await this.reportsService.findAll(
       skip,
       limit,
+      query,
     );
     return {
       message: 'Reports fetched successfully',

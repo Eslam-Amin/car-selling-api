@@ -5,6 +5,7 @@ import { Report } from './report.entity';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { User } from '../users/user.entity';
 import { GetEstimateDto } from './dtos/get-estimate.dto';
+import { GetReportsDto } from './dtos/get-reports.dto';
 
 @Injectable()
 export class ReportsService {
@@ -16,10 +17,28 @@ export class ReportsService {
     return this.repo.save(report);
   }
 
-  async findAll(skip: number, limit: number) {
+  async findAll(skip: number, limit: number, query: GetReportsDto) {
+    const { make, model, year, mileage, lng, lat, price, approved } = query;
+    const filter: Partial<GetReportsDto> = {};
+    if (make) filter.make = make;
+    if (model) filter.model = model;
+    if (year) filter.year = year;
+    if (mileage) filter.mileage = mileage;
+    if (lng) filter.lng = lng;
+    if (lat) filter.lat = lat;
+    if (price) filter.price = price;
+    if (approved !== undefined && approved !== null) filter.approved = approved;
+
     const [reports, reportsCount] = await Promise.all([
-      this.repo.find({ skip, take: limit, relations: ['user'] }),
-      this.repo.count(),
+      this.repo.find({
+        skip,
+        take: limit,
+        relations: ['user'],
+        where: filter,
+      }),
+      this.repo.count({
+        where: filter,
+      }),
     ]);
     return { reports, reportsCount };
   }
@@ -59,6 +78,7 @@ export class ReportsService {
       .andWhere('lng -:lng BETWEEN -5 AND 5', { lng })
       .andWhere('lat -:lat BETWEEN -5 AND 5', { lat })
       .andWhere('year -:year BETWEEN -3 AND 3', { year })
+      .andWhere('approved IS TRUE')
       .orderBy('ABS(mileage - :mileage)', 'DESC')
       .setParameters({ mileage })
       .limit(3)
