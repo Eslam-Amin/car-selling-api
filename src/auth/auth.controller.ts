@@ -15,11 +15,15 @@ import { VerifyDto } from './dtos/verify.dto';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { SendVerificationCodeDto } from './dtos/sendVerificationCode.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 @Serialize(UserDto)
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Post('/signup')
   async createUser(@Body() body: CreateUserDto, @Session() session: any) {
@@ -35,8 +39,8 @@ export class AuthController {
       message: 'User created successfully',
       data: user,
       other:
-        process.env.NODE_ENV === 'test' ||
-        process.env.NODE_ENV === 'development'
+        this.configService.get('NODE_ENV') === 'test' ||
+        this.configService.get('NODE_ENV') === 'development'
           ? { verificationCode }
           : {},
     };
@@ -81,8 +85,8 @@ export class AuthController {
       message: 'Verification code resent successfully',
       data: user,
       other:
-        process.env.NODE_ENV === 'test' ||
-        process.env.NODE_ENV === 'development'
+        this.configService.get('NODE_ENV') === 'test' ||
+        this.configService.get('NODE_ENV') === 'development'
           ? { verificationCode }
           : {},
     };

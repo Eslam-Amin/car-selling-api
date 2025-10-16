@@ -5,11 +5,13 @@ import { User } from './user.entity';
 import { Repository, ILike } from 'typeorm';
 import type { Cache } from 'cache-manager';
 import * as bcrypt from 'bcryptjs';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private repo: Repository<User>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private configService: ConfigService,
   ) {}
   async findOne(id: number, throwError?: boolean): Promise<User | null>;
   async findOne(identifier: string, throwError?: boolean): Promise<User | null>;
@@ -135,16 +137,16 @@ export class UsersService {
 
   async createDefaultAdminUser(): Promise<void> {
     const existingUser = await this.repo.findOne({
-      where: { email: `${process.env.ADMIN_EMAIL}` },
+      where: { email: `${this.configService.get('ADMIN_EMAIL')}` },
     });
 
     if (!existingUser) {
       const hashedPassword = await bcrypt.hash(
-        `${process.env.ADMIN_PASSWORD}`,
+        `${this.configService.get('ADMIN_PASSWORD')}`,
         10,
       );
       const user = this.createOne(
-        `${process.env.ADMIN_EMAIL}`,
+        `${this.configService.get('ADMIN_EMAIL')}`,
         hashedPassword,
         'iamsuperadmin',
         'Super',
