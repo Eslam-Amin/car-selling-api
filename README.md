@@ -1,98 +1,343 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Car Selling API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive REST API built with NestJS for managing car sales reports, user authentication, and price estimation. This project demonstrates modern backend development practices including authentication, authorization, data validation, caching, and email services.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Features
 
-## Description
+### 🔐 Authentication & Authorization
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **User Registration & Login**: Secure user account creation with email verification
+- **Session Management**: Cookie-based session handling for user authentication
+- **Email Verification**: Automated email verification system with verification codes
+- **Role-based Access Control**: Admin and regular user roles with different permissions
+- **Password Security**: Bcrypt hashing for secure password storage
 
-## Project setup
+### 🚗 Car Reports Management
+
+- **Create Reports**: Submit car sale reports with detailed vehicle information
+- **Price Estimation**: Get estimated car values based on make, model, year, mileage, and location
+- **Report Approval**: Admin-controlled approval system for car reports
+- **Geographic Data**: Location-based reporting with latitude/longitude coordinates
+- **Report Filtering**: Advanced filtering and search capabilities
+
+### 👥 User Management
+
+- **User Profiles**: Complete user profile management with personal information
+- **User Search**: Search and filter users with pagination
+- **Profile Updates**: Update user information and settings
+- **User Administration**: Admin tools for user management
+
+### 📧 Email Services
+
+- **Verification Emails**: Automated email verification system
+- **Template Engine**: Handlebars-based email templates
+- **SMTP Integration**: Configurable email service integration
+
+### 🗄️ Data Management
+
+- **SQLite Database**: Lightweight, file-based database for development
+- **TypeORM Integration**: Object-Relational Mapping with TypeScript
+- **Data Validation**: Comprehensive input validation using class-validator
+- **Caching**: Redis-compatible caching for improved performance
+
+## 🛠️ Technology Stack
+
+- **Framework**: NestJS (Node.js)
+- **Language**: TypeScript
+- **Database**: SQLite with TypeORM
+- **Authentication**: Cookie-based sessions with bcrypt
+- **Validation**: class-validator & class-transformer
+- **Email**: Nodemailer with Handlebars templates
+- **Caching**: NestJS Cache Manager
+- **Testing**: Jest for unit and e2e testing
+- **Code Quality**: ESLint & Prettier
+
+## 📋 Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- SQLite3
+
+## 🚀 Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd car-selling-api
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Environment Configuration**
+   Create environment files for different environments:
+
+   ```bash
+   # Development
+   touch .env.development
+
+   # Test
+   touch .env.test
+
+   # Production
+   touch .env.production
+   ```
+
+4. **Environment Variables**
+   Add the following variables to your `.env.development` file:
+   ```env
+   NODE_ENV=development
+   PORT=5000
+   DB_NAME=db.sqlite
+   COOKIE_KEY=your-secret-cookie-key
+   EMAIL_HOST=your-smtp-host
+   EMAIL_PORT=587
+   EMAIL_USER=your-email@example.com
+   EMAIL_PASS=your-email-password
+   ```
+
+## 🏃‍♂️ Running the Application
+
+### Development Mode
 
 ```bash
-$ npm install
+npm run start:dev
 ```
 
-## Compile and run the project
+### Production Mode
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run build
+npm run start:prod
 ```
 
-## Run tests
+### Debug Mode
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run start:debug
 ```
 
-## Deployment
+## 🧪 Testing
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Unit Tests
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run test
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### E2E Tests
 
-## Resources
+```bash
+npm run test:e2e
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Test Coverage
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npm run test:cov
+```
 
-## Support
+### Watch Mode
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm run test:watch
+```
 
-## Stay in touch
+## 📚 API Endpoints
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Authentication (`/auth`)
 
-## License
+- `POST /auth/signup` - User registration
+- `POST /auth/login` - User login
+- `POST /auth/logout` - User logout
+- `POST /auth/verify` - Email verification
+- `POST /auth/verification-code` - Resend verification code
+- `GET /auth/whoami` - Get current user info
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Users (`/users`)
+
+- `GET /users` - Get all users (with pagination and search)
+- `GET /users/:id` - Get user by ID
+- `PATCH /users/:id` - Update user
+- `DELETE /users/:id` - Delete user
+- `DELETE /users` - Delete all users
+
+### Reports (`/reports`)
+
+- `GET /reports/estimate` - Get car price estimate
+- `POST /reports` - Create new report
+- `GET /reports` - Get all reports (with pagination and filtering)
+- `GET /reports/:id` - Get report by ID
+- `PATCH /reports/:id` - Update report
+- `PATCH /reports/:id/approve` - Approve report (Admin only)
+- `DELETE /reports/:id` - Delete report (Admin only)
+- `DELETE /reports` - Delete all reports (Admin only)
+
+### Application (`/app`)
+
+- `GET /app` - Health check endpoint
+
+## 📊 Data Models
+
+### User Entity
+
+```typescript
+{
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  password: string;
+  verified: boolean;
+  verificationCode: string;
+  verificationCodeExpiresAt: Date;
+  isAdmin: boolean;
+  fullName: string; // Virtual field
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### Report Entity
+
+```typescript
+{
+  id: number;
+  price: number;
+  make: string;
+  model: string;
+  year: number;
+  mileage: number;
+  lng: number;
+  lat: number;
+  approved: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  user: User;
+}
+```
+
+## 🔧 Configuration
+
+The application uses environment-based configuration with the following structure:
+
+- `.env.development` - Development environment
+- `.env.test` - Test environment
+- `.env.production` - Production environment
+
+## 🏗️ Project Structure
+
+```
+src/
+├── auth/                 # Authentication module
+│   ├── dtos/            # Data Transfer Objects
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   └── auth.module.ts
+├── users/               # User management module
+│   ├── dtos/
+│   ├── decorators/
+│   ├── user.entity.ts
+│   ├── users.controller.ts
+│   ├── users.service.ts
+│   └── users.module.ts
+├── reports/             # Reports module
+│   ├── dtos/
+│   ├── report.entity.ts
+│   ├── reports.controller.ts
+│   ├── reports.service.ts
+│   └── reports.module.ts
+├── email/               # Email service module
+│   ├── email.service.ts
+│   └── email.module.ts
+├── guards/              # Authentication guards
+├── interceptors/        # Response interceptors
+├── templates/           # Email templates
+├── app.module.ts        # Main application module
+├── main.ts             # Application entry point
+└── app.controller.ts   # Main controller
+```
+
+## 🚦 Request/Response Format
+
+All API responses follow a consistent format:
+
+```typescript
+{
+  message: string;
+  data: any;
+  pagination?: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    total: number;
+  };
+  other?: any;
+}
+```
+
+## 🔒 Security Features
+
+- **Input Validation**: Comprehensive validation using class-validator
+- **Password Hashing**: Bcrypt for secure password storage
+- **Session Security**: Secure cookie-based session management
+- **SQL Injection Protection**: TypeORM query builder prevents SQL injection
+- **CORS Configuration**: Configurable Cross-Origin Resource Sharing
+- **Rate Limiting**: Built-in request rate limiting capabilities
+
+## 🎯 Key Features Explained
+
+### Price Estimation
+
+The API provides intelligent car price estimation based on:
+
+- Vehicle make and model
+- Manufacturing year
+- Mileage
+- Geographic location (latitude/longitude)
+- Market trends and historical data
+
+### Admin Controls
+
+Administrators have special privileges:
+
+- Approve/reject car reports
+- Delete reports and users
+- Access to all user data
+- System-wide management capabilities
+
+### Email Verification System
+
+- Automated verification code generation
+- Email templates with Handlebars
+- Configurable SMTP settings
+- Development mode shows verification codes in response
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the UNLICENSED License - see the package.json file for details.
+
+## 👨‍💻 Author
+
+Built as part of a NestJS course by Stephen Grider on Udemy.
+
+## 🆘 Support
+
+For support and questions, please open an issue in the repository or contact the development team.
+
+---
+
+**Note**: This is a learning project demonstrating modern backend development practices with NestJS, TypeScript, and various enterprise-level features.
